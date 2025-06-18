@@ -1,0 +1,81 @@
+---
+title: "Mini-Project 02"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+---
+
+# Data Visualization Project 02
+
+_revised version of mini-project 02 goes here_
+# Objectives
+The goal of this project is to develop three data visualizations from a distinct data sets to demonstrate skill in R by developing interactive plots, using various data types, and modeling the data. This work analyzes data collected from a 2017 Marathon, NBA Championship Data, and geological data surveying Florida's Lakes to create these plots.
+
+### (a) What were the original charts you planned to create for this assignment?
+I planned to use the spatial data to plot a map recreating the shape of Florida from the lakes. When assessing the data for the marathon runners and NBA champions I wanted to create plots that utilized point and bar geometries and implemented color to aid in the interpretation. The two sport relate data set's seemed promising to evaluate and generate a model; the NBA champions set was populated with more data per team so I chose to model the data for certain years.
+
+### (b) What story could you tell with your plots?
+The plots created for this project illustrate three distinct stories. The first illustrates the distribution of lake area in Florida State; the story it conveys is the relationship between the density of lakes near each other in regards to its overall area and shows a concentration of lakes in the center of the state. The second depicts the points per game for the Lakers over the course of their occurrences in the NBA Championships. The story it tells is that earlier iterations of the Lakers team scored higher points in initial games and attenuated to a stead value; in the following years the amount of points gained during the initial games decreased but peaks during the 4th and 6th games. The final plot illustrates the relationship between 5K lap time and age. It shows a story of determination and perseverance as the runners with the shortest 5K time and best pace included the young and the old.
+
+### (c) How did you apply the principles of data visualizations and design for this assignment?
+The principles of data visualization were applied to each plot to ensure the audience can interpret the data. Some actions that were taken to realize this were the use of aesthetics; by linking attributes like color to the NBA team years it allows for a clearer view of timeline for this team and how their performance changed. Additionally, titles, axis labels, themes and legends were implemented to reduce the complexity of the data and provide a sense of navigation for the audience. This ensure the audience can interpret the trends shown and follow along with headings.
+
+# Including Libraries and Reading Data
+```{r}
+library(tidyverse)
+library(sf)
+library(plotly)
+
+runData <- read_csv("data/marathon_results_2017.csv")
+ballData <- read_csv("data/NBAchampionsdata.csv")
+lakeData <- read_sf("data/Florida_Lakes/Florida_Lakes.shp")
+```
+
+# Spatial Visualization
+This plot illustrates the distribution of lakes in Florida State. Using the .shp file, the lake data is mapped to the longitude (x-axis) and latitude (y-axis) to create the shapes. Next, the color of the lakes are mapped to a blue color scheme and the area of each lake is mapped to the color aesthetic to illustrate the size of the lake and its surrounding lakes. It can be observed that the highest density of lakes occurs in the Central Florida region with a uniform distribution of area; additionally, the largest lake can be spotted at 81 deg West and 28 deg North.
+```{r, dev="png"}
+p <- ggplot() +
+  geom_sf(data = lakeData, mapping = aes(fill = SHAPEAREA), color = "black", size = 0.2) +
+  scale_fill_viridis_c(option = "mako", na.value = "grey80")
+p + labs(title = "Spatial Map of Florida Lakes",fill = "Shape Area", x = "Longitude", y = "Latitude")
+```
+
+# Model Visualization
+This plot surveys the Lakers and illustrates the points scored per game of their appearances in the NBA championships. Three years are included in the dataset for the Laker's and assessed in a bar chart to assess the point distribution. It can be observed that over time there is a noticable decline in point obtained in the first two games but the trendline shows that overall the team obtains near 100 pts per game. 
+```{r}
+teamS = c("Lakers")
+yearS = c("1987", "2000", "2009")
+col = c("red", "blue", "green")
+nba_data <- ballData %>%
+  filter(Team %in% teamS , Year %in% yearS)
+
+q <- ggplot(data = nba_data, mapping = aes(x = Game, y = PTS, fill = factor(Year)))
+q + geom_col(position = "dodge") + scale_fill_manual(values = col) +
+  labs(title = "Lakers Timeline Analysis: Points per Game", x = "Game", y = "Points", fill = "Year") +
+  geom_smooth(method = "lm", aes(group = Year, color = factor(Year)), se = FALSE, size = 3)
+
+
+```
+
+# Interactive Visualization
+The final plot illustrates the relationship between 5K marathon times and contestant age. It can be shown that despite age differences, runners with the fastest times can be in the range of 25-40 years old. The scaled pace is calculated by taking the ratio of the runners pace with that of the slowest pace; the lower the percentage, the faster the runner was throughout the duration of the race. It can be shown that although for the first 5K the young and older runners can achiever similar lap times, as the distance progresses to the 10K, 20K mark, the lap time increases along with the scaled pace.
+```{r}
+library(plotly)
+cleanRun <- runData %>%
+  filter(Country == "USA") %>%
+  rename(`Points5K` = `5K`) %>%
+  arrange(Points5K)  %>%
+  mutate(scaledPace = (as.numeric(Pace) / max(as.numeric(Pace))) * 100, na.rm = TRUE)%>%
+  slice_head(n=40)
+
+
+my_plot <- ggplot( data = cleanRun) +
+  geom_point(aes(x = Age, y = Points5K, colour  = State, size = scaledPace )) +
+  theme_minimal() +
+  labs(title = "5K Time vs. Age", x = "Age", y = "5K Lap Time", colour = "State", size = "Pace")
+
+ggplotly(my_plot)
+
+```
