@@ -29,10 +29,10 @@ sample_n(weather_tpa, 4)
 ## # A tibble: 4 × 7
 ##    year month   day precipitation max_temp min_temp ave_temp
 ##   <dbl> <dbl> <dbl>         <dbl>    <dbl>    <dbl>    <dbl>
-## 1  2022     2    24       0             86       68       77
-## 2  2022     1     4       0             76       50       63
-## 3  2022     9    16       0.87          88       74       81
-## 4  2022     6     3       0.00001       86       76       81
+## 1  2022    12     6             0       81       66     73.5
+## 2  2022     2    18             0       81       68     74.5
+## 3  2022    12    28             0       75       48     61.5
+## 4  2022     5    12             0       87       66     76.5
 ```
 
 See Slides from Week 4 of Visualizing Relationships and Models (slide 10) for a reminder on how to use this type of dataset with the `lubridate` package for dates and times (example included in the slides uses data from 2016).
@@ -50,22 +50,31 @@ library(lubridate)
 
 tpa_clean <- weather_tpa %>%
   unite("doy", year, month, day, sep = "-") %>%
-  mutate(
-    doy = ymd(doy),
-    max_temp = as.double(max_temp),
-    min_temp = as.double(min_temp),
-    precipitation = as.double(precipitation),
-    month = month(doy, label = TRUE, abbr = FALSE)
+  mutate(doy = ymd(doy),
+         max_temp = as.double(max_temp),
+         min_temp = as.double(min_temp),
+         precipitation = as.double(precipitation),
+         month = month(doy, label = TRUE, abbr = FALSE)
   )
 
 ggplot(tpa_clean, aes(x = max_temp, fill = month)) +
   geom_histogram(binwidth = 3, color = "white") +
   facet_wrap(~ month, ncol = 3) +
-  labs(
-    x = "Max Temperature (°F)",
-    y = "Number of Days"
-  ) +
-  theme_minimal(base_size = 12)
+  labs(x = "Max Temperature", y = "Number of Days") +
+  theme_minimal() + 
+  theme(legend.position = "none",
+    strip.background = element_rect(fill = "grey80", color = NA)) +
+  scale_x_continuous(limits = c(50, 100), breaks = seq(60, 90, 10))
+```
+
+```
+## Warning: Removed 2 rows containing non-finite outside the scale range
+## (`stat_bin()`).
+```
+
+```
+## Warning: Removed 24 rows containing missing values or values outside the scale range
+## (`geom_bar()`).
 ```
 
 ![](Harkhu_project_03_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
@@ -78,16 +87,15 @@ Hint: check the `kernel` parameter of the `geom_density()` function, and use `bw
 
 ``` r
 ggplot(tpa_clean, aes(x = max_temp)) +
-  geom_density(fill = "gray80", color = "black", bw = 0.5) +
-  labs(
-    title = "Density of Daily Maximum Temperatures",
-    x = "Max Temperature (°F)",
-    y = "Density"
-  ) +
+  geom_density(fill = "gray50", color = "black", bw = 0.5) +
+  labs(x = "Max temperature", y = "density") +
   theme_minimal(base_size = 12) +
-  theme(
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 14)
-  )
+  scale_x_continuous(limits = c(50, 100), breaks = seq(60, 90, 10))
+```
+
+```
+## Warning: Removed 2 rows containing non-finite outside the scale range
+## (`stat_density()`).
 ```
 
 ![](Harkhu_project_03_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
@@ -101,20 +109,17 @@ Hint: default options for `geom_density()` were used.
 
 ``` r
 # Create the faceted density plot
-ggplot(tpa_clean, aes(x = max_temp)) +
-  geom_density(fill = "gray80", color = "black") +
+ggplot(tpa_clean, aes(x = max_temp, fill = month)) +
+  geom_density(color = "black") +
   facet_wrap(~ month, ncol = 3) +
   scale_x_continuous(limits = c(60, 90), breaks = seq(60, 90, 10)) +
-  labs(
-    title = "Density of Daily Maximum Temperatures by Month",
-    x = "Max Temperature (°F)",
-    y = "Density"
-  ) +
-  theme_minimal(base_size = 12) +
+  labs(x = "Max Temperature (°F)", y = "Density") +
+  theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
     strip.text = element_text(face = "bold"),
-    panel.grid.minor = element_blank()
+    panel.grid.minor = element_blank(),
+    strip.background = element_rect(fill = "grey80", color = NA)
   )
 ```
 
@@ -154,10 +159,7 @@ ggplot(tpa_clean, aes(x = max_temp, y = month, fill = stat(x))) +
   ) +
   scale_fill_viridis_c(option = "plasma", limits = c(60, 100), name = "Temp (°F)") +
   scale_x_continuous(limits = c(50, 100), breaks = seq(50, 100, 10)) +
-  labs(
-    title = "Density of Daily Maximum Temperatures by Month",
-    x = "Max Temperature (°F)",
-    y = NULL
+  labs(x = "Max Temperature (°F)", y = NULL
   ) +
   theme_minimal(base_size = 12) 
 ```
