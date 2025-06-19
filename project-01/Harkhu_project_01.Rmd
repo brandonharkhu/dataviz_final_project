@@ -38,6 +38,7 @@ The first plot illustrates the distribution of rodent complaints by borough, ove
 p <- ggplot(data = clean, mapping = aes(x = borough,fill = borough)) + 
   labs(x = "Boroughs", title = "Rodent Complaints per Borough", fill = "Borough")
 p + geom_bar() + theme_bw() + coord_flip()
+ggsave("figures/PROJECT1_FIG1.png")
 ```
 ## Data Visual 2
 The second plot illustrates the distribution of complaints per borough evaluated at each year. It can be seen that at the beginning of the study in 2015 the Bronx had the highest amount of complaints but was reduced in the following years. Additionally, it can be observed that the number of incidents for the Bronx dropped to values closer to other boroughs, leaving Brooklyn with the most rodent complaints
@@ -45,6 +46,7 @@ The second plot illustrates the distribution of complaints per borough evaluated
 q <- ggplot(data = clean, mapping = aes(x = factor(sighting_year), y =n, fill = borough)) + 
   labs(x = "Year",y = "Rodent Complaints", title = "Rodent Complaints per Year", fill = "Borough")
 q  + geom_bar(stat = "identity", position = "dodge") + theme_bw()
+ggsave("figures/PROJECT1_FIG2.png")
 ```
 ## Data Visual 3
 Another way to visualize the distribution of rodent complaints by borough and number of complaints is to use the associated location data to plot the incident on a map. By associating color with borough the location distribution can be assessed. By coupling the transparency of the data point with the amount of rodent complaints, the density of complaints can be assessed by location, seeing where the majority of complaints occur visually on a map. It can be observed that the density of complaints is largest in areas away from the water. Additionally, a big gap can be noted in Manhattan, highlighting where Central Park is located.
@@ -52,6 +54,7 @@ Another way to visualize the distribution of rodent complaints by borough and nu
 r <- ggplot(data = clean, mapping = aes(x = longitude,y=latitude,color = borough,alpha = n)) + 
   labs(x = "Longitude", y = "Latitude", title = "Rodent Complaint Heatmap", color = "Borough", alpha = "No. Rodent Complaints")
 r + geom_point() + theme_bw()
+ggsave("figures/PROJECT1_FIG3.png")
 ```
 
 ## Data Visual 4
@@ -60,6 +63,7 @@ By removing the transparency aesthetic, a map of New York City can be generated 
 s <- ggplot(data = clean, mapping = aes(x = longitude,y=latitude,color = borough)) + 
   labs(x = "Longitude", y = "Latitude", title = "Map of NYC based on Rodent Complaint Distribution", color = "Borough", alpha = "No. Rodent Complaints")
 s + geom_point() + theme_bw()
+ggsave("figures/PROJECT1_FIG4.png")
 ```
 
 ## Data Visual 5
@@ -69,4 +73,5 @@ filtered_df <- ratData %>% filter(location_type %in% c("1-2 Family Dwelling", "3
 t <- ggplot(data = filtered_df, mapping = aes(x = longitude, y = latitude, color = location_type)) + 
   labs(x = "Longitude",y = "Latitude", title = "Rodent Complaints based on Location Type", color = "Location Type")
 t + geom_point() + theme_bw()
+ggsave("figures/PROJECT1_FIG5.png")
 ```
