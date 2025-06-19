@@ -17,11 +17,22 @@ In this exercise you will explore methods to create different types of data visu
 
 Using the dataset obtained from FSU's [Florida Climate Center](https://climatecenter.fsu.edu/climate-data-access-tools/downloadable-data), for a station at Tampa International Airport (TPA) for 2022, attempt to recreate the charts shown below which were generated using data from 2016. You can read the 2022 dataset using the code below: 
 
-```{r, message=FALSE, warning=FALSE}
+
+``` r
 library(tidyverse)
 weather_tpa <- read_csv("data/tpa_weather_2022.csv")
 # random sample 
 sample_n(weather_tpa, 4)
+```
+
+```
+## # A tibble: 4 × 7
+##    year month   day precipitation max_temp min_temp ave_temp
+##   <dbl> <dbl> <dbl>         <dbl>    <dbl>    <dbl>    <dbl>
+## 1  2022     2    24       0             86       68       77
+## 2  2022     1     4       0             76       50       63
+## 3  2022     9    16       0.87          88       74       81
+## 4  2022     6     3       0.00001       86       76       81
 ```
 
 See Slides from Week 4 of Visualizing Relationships and Models (slide 10) for a reminder on how to use this type of dataset with the `lubridate` package for dates and times (example included in the slides uses data from 2016).
@@ -30,12 +41,11 @@ Using the 2022 data:
 
 (a) Create a plot like the one below:
 
-```{r, echo = FALSE, out.width="80%", fig.align='center'}
-knitr::include_graphics("https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_facet.png")
-```
+<img src="https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_facet.png" width="80%" style="display: block; margin: auto;" />
 
 Hint: the option `binwidth = 3` was used with the `geom_histogram()` function.
-```{r}
+
+``` r
 library(lubridate)
 
 tpa_clean <- weather_tpa %>%
@@ -58,14 +68,15 @@ ggplot(tpa_clean, aes(x = max_temp, fill = month)) +
   theme_minimal(base_size = 12)
 ```
 
+![](Harkhu_project_03_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
 (b) Create a plot like the one below:
 
-```{r, echo = FALSE, out.width="80%", fig.align='center'}
-knitr::include_graphics("https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_density.png")
-```
+<img src="https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_density.png" width="80%" style="display: block; margin: auto;" />
 
 Hint: check the `kernel` parameter of the `geom_density()` function, and use `bw = 0.5`.
-```{r}
+
+``` r
 ggplot(tpa_clean, aes(x = max_temp)) +
   geom_density(fill = "gray80", color = "black", bw = 0.5) +
   labs(
@@ -79,15 +90,16 @@ ggplot(tpa_clean, aes(x = max_temp)) +
   )
 ```
 
+![](Harkhu_project_03_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
 
 (c) Create a plot like the one below:
 
-```{r, echo = FALSE, out.width="80%", fig.align='center'}
-knitr::include_graphics("https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_density_facet.png")
-```
+<img src="https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_density_facet.png" width="80%" style="display: block; margin: auto;" />
 
 Hint: default options for `geom_density()` were used. 
-```{r}
+
+``` r
 # Create the faceted density plot
 ggplot(tpa_clean, aes(x = max_temp)) +
   geom_density(fill = "gray80", color = "black") +
@@ -106,16 +118,22 @@ ggplot(tpa_clean, aes(x = max_temp)) +
   )
 ```
 
+```
+## Warning: Removed 116 rows containing non-finite outside the scale range
+## (`stat_density()`).
+```
+
+![](Harkhu_project_03_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
 (d) Generate a plot like the chart below:
 
 
-```{r, echo = FALSE, out.width="80%", fig.align='center'}
-knitr::include_graphics("https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_ridges_plasma.png")
-```
+<img src="https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/tpa_max_temps_ridges_plasma.png" width="80%" style="display: block; margin: auto;" />
 `geom_density_ridges_gradient()`
 
 Hint: use the`{ggridges}` package, and the `geom_density_ridges()` function paying close attention to the `quantile_lines` and `quantiles` parameters. The plot above uses the `plasma` option (color scale) for the _viridis_ palette.
-```{r}
+
+``` r
 library(ggridges)
 
 tpa_clean <- tpa_clean %>%
@@ -142,15 +160,30 @@ ggplot(tpa_clean, aes(x = max_temp, y = month, fill = stat(x))) +
     y = NULL
   ) +
   theme_minimal(base_size = 12) 
-
+```
 
 ```
+## Warning in geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, :
+## Ignoring unknown parameters: `size`
+```
+
+```
+## Warning: `stat(x)` was deprecated in ggplot2 3.4.0.
+## ℹ Please use `after_stat(x)` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+```
+
+```
+## Picking joint bandwidth of 1.87
+```
+
+![](Harkhu_project_03_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 
 (e) Create a plot of your choice that uses the attribute for precipitation _(values of -99.9 for temperature or -99.99 for precipitation represent missing data)_.
-```{r}
 
-```
 
 
 ## PART 2 
@@ -196,14 +229,16 @@ Concrete compressive strength | MPa, megapascals
 
 Below we read the `.csv` file using `readr::read_csv()` (the `readr` package is part of the `tidyverse`)
 
-```{r}
+
+``` r
 concrete <- read_csv("data/concrete.csv", col_types = cols())
 ```
 
 
 Let us create a new attribute for visualization purposes, `strength_range`: 
 
-```{r}
+
+``` r
 new_concrete <- concrete %>%
   mutate(strength_range = cut(Concrete_compressive_strength, 
                               breaks = quantile(Concrete_compressive_strength, 
@@ -216,16 +251,12 @@ new_concrete <- concrete %>%
 
 2. Use a _temporal_ indicator such as the one available in the variable `Age` (measured in days). Generate a plot similar to the one shown below. Comment on your results.
 
-```{r, echo = FALSE, out.width="80%", fig.align='center'}
-knitr::include_graphics("https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/concrete_strength.png")
-```
+<img src="https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/concrete_strength.png" width="80%" style="display: block; margin: auto;" />
 
 
 3. Create a scatterplot similar to the one shown below. Pay special attention to which variables are being mapped to specific aesthetics of the plot. Comment on your results. 
 
-```{r, echo = FALSE, out.width="80%", fig.align='center'}
-knitr::include_graphics("https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/cement_plot.png")
-```
+<img src="https://raw.githubusercontent.com/aalhamadani/dataviz_final_project/main/figures/cement_plot.png" width="80%" style="display: block; margin: auto;" />
 
 
 
